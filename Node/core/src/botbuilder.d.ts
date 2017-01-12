@@ -503,7 +503,15 @@ export interface IBeginDialogActionOptions extends IDialogActionOptions {
 
 /** Options passed when defining a `triggerAction()`. */
 export interface ITriggerActionOptions extends IBeginDialogActionOptions {
-    /** (Optional) If true the triggered dialog will be started at the root of the stack. */
+    /**
+     * If specified the user will be asked to confirm that they are ok canceling the current 
+     * uncompleted task.
+     * * _{string}_ - Initial message to send the user.
+     * * _{string[]}_ - Array of possible messages to send user. One will be chosen at random. 
+     * * _{IMessage}_ - Message to send the user. Message can contain attachments. 
+     * * _{IIsMessage}_ - Instance of the [Message](/en-us/node/builder/chat-reference/classes/_botbuilder_d_.message.html) builder class. 
+     */
+    confirmPrompt?: string|string[]|IMessage|IIsMessage;
 
     /** 
      * (Optional) custom handler called when a root dialog is being interrupted by another root 
@@ -523,7 +531,7 @@ export interface ICancelActionOptions extends IDialogActionOptions {
      * action when triggered. 
      * * _{string}_ - Initial message to send the user.
      * * _{string[]}_ - Array of possible messages to send user. One will be chosen at random. 
-     * * _{IMessage}_ - Initial message to send the user. Message can contain attachments. 
+     * * _{IMessage}_ - Message to send the user. Message can contain attachments. 
      * * _{IIsMessage}_ - Instance of the [Message](/en-us/node/builder/chat-reference/classes/_botbuilder_d_.message.html) builder class. 
      */
     confirmPrompt?: string|string[]|IMessage|IIsMessage;
@@ -1735,6 +1743,9 @@ export class Keyboard implements IIsAttachment {
      */
     constructor(session?: Session);
 
+    /** Session object for the current conversation. */
+    protected session?: Session;
+
     /** Set of actions applicable to the current card. Not all channels support buttons or cards with buttons. Some channels may choose to render the buttons using a custom keyboard. */  
     buttons(list: ICardAction[]|IIsCardAction[]): ThumbnailCard;
 
@@ -2931,6 +2942,7 @@ export class UniversalBot extends Library  {
      * - __incoming:__ An incoming message has been received and processed by middleware. Passed an [IMessage](/en-us/node/builder/chat-reference/interfaces/_botbuilder_d_.imessage.html) object.
      * - __routing:__ An incoming message has been bound to a session and is about to be routed through any session middleware and then dispatched to the active dialog for processing. Passed a [Session](/en-us/node/builder/chat-reference/classes/_botbuilder_d_.session.html) object.
      * - __send:__ An outgoing message is about to be sent to middleware for processing. Passed an [IMessage](/en-us/node/builder/chat-reference/interfaces/_botbuilder_d_.imessage.html) object.
+     * - __outgoing:__ An outgoing message has just been sent through middleware and is about to be delivered to the users chat client.
      * - __getStorageData:__ The sessions persisted state data is being loaded from storage. Passed an [IBotStorageContext](/en-us/node/builder/chat-reference/interfaces/_botbuilder_d_.ibotstoragecontext.html) object.
      * - __saveStorageData:__ The sessions persisted state data is being written to storage. Passed an [IBotStorageContext](/en-us/node/builder/chat-reference/interfaces/_botbuilder_d_.ibotstoragecontext.html) object.
      * 

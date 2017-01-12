@@ -103,15 +103,15 @@ export class UniversalBot extends Library {
         this.library(systemLib);
         if (defaultDialog) {
             // Check for legacy settings passed in
-            if (typeof defaultDialog === 'object') {
+            if (typeof defaultDialog === 'function' || Array.isArray(defaultDialog)) {
+                this.dialog('/', defaultDialog);
+            } else {
                 var settings = <IUniversalBotSettings>defaultDialog;
                 for (var name in settings) {
                     if (settings.hasOwnProperty(name)) {
                         this.set(name, (<any>settings)[name]);
                     }
                 }
-            } else {
-                this.dialog('/', defaultDialog);
             }
         }
         if (connector) {
@@ -467,14 +467,14 @@ export class UniversalBot extends Library {
 
     private eventMiddleware(event: IEvent, middleware: IEventMiddleware[], done: Function, error?: (err: Error) => void): void {
         var i = -1;
-        var _this = this;
+        var _that = this;
         function next() {
             if (++i < middleware.length) {
-                _this.tryCatch(() => {
+                _that.tryCatch(() => {
                     middleware[i](event, next);
                 }, () => next());
             } else {
-                _this.tryCatch(() => done(), error);
+                _that.tryCatch(() => done(), error);
             }
         }
         next();
